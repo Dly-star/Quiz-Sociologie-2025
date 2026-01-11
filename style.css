@@ -1,65 +1,131 @@
+/* Design Moderne & Mobile First */
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #ecf0f1;
-  color: #2c3e50;
-  margin: 0;
-  padding: 20px;
-  display: flex;
-  justify-content: center;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6;
+    color: #333;
 }
 
+/* Header du Président optimisé pour Mobile */
+.presi-header {
+    background: #2c3e50;
+    color: white;
+    padding: 12px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.presi-header img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 2px solid #27ae60;
+    object-fit: cover;
+}
+
+.presi-info b {
+    display: block;
+    font-size: 14px;
+    color: #fff;
+}
+
+.presi-info span {
+    font-size: 11px;
+    color: #bdc3c7;
+}
+
+/* Container adaptable */
 .container {
-  background: white;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  width: 100%;
-  max-width: 600px;
+    padding: 20px;
+    max-width: 500px;
+    margin: 0 auto;
 }
 
+h2 {
+    text-align: center;
+    color: #2c3e50;
+    font-size: 22px;
+    margin-bottom: 25px;
+}
+
+/* Cartes (Login, Quiz, Result) */
+#login, #quiz, #result, #student-review {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+/* Inputs Android Style */
 input[type="text"] {
-  width: 90%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #bdc3c7;
-  border-radius: 4px;
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 16px; /* Évite le zoom auto sur iPhone/Android */
 }
 
+/* Boutons Larges et Tactiles */
 button {
-  background-color: #27ae60;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-  border-radius: 4px;
-  margin-top: 10px;
-  width: 100%;
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.3s;
+    margin-top: 10px;
+    color: white;
 }
 
-button:hover {
-  background-color: #2ecc71;
+button:active {
+    transform: scale(0.98);
 }
 
-.admin-btn {
-  background-color: #7f8c8d;
-  margin-top: 20px;
+.btn-start { background-color: #27ae60; }
+.btn-review { background-color: #2980b9; }
+
+/* Options du Quiz (Checkboxes) */
+.option-label {
+    display: block;
+    background: #f8f9fa;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    cursor: pointer;
+    font-size: 15px;
 }
 
-label.option-label {
-  display: block;
-  background: #f8f9fa;
-  padding: 10px;
-  margin-bottom: 5px;
-  border-radius: 4px;
-  cursor: pointer;
+.option-label:has(input:checked) {
+    background: #e1f5fe;
+    border-color: #2980b9;
 }
 
-label.option-label:hover {
-  background: #e9ecef;
+input[type="checkbox"] {
+    margin-right: 12px;
+    transform: scale(1.2);
 }
 
+/* Fenêtre À Propos (Modal) */
+#about-modal div {
+    width: 85% !important;
+    border-radius: 15px !important;
+    padding: 20px !important;
+}
+
+/* Feedback Zone */
 #feedback {
     font-weight: bold;
-    font-size: 1.1em;
+    text-align: center;
+    margin-top: 10px;
 }
