@@ -439,4 +439,105 @@ const questions = [
   ],
   correct: [0,1,2,4]
 },
+  const questions = [
+  {
+    question: "1. Selon J.M. Morin, quelles sont les raisons qui empêchent de définir la sociologie ? (Plusieurs réponses possibles)",
+    options: [
+      "On ne peut pas la définir par les auteurs",
+      "On ne peut pas la définir par les méthodes",
+      "On ne peut pas la définir par les théories",
+      "On ne peut pas la définir par la biologie"
+    ],
+    correct: [0, 1, 2] // A, B, C sont vraies selon ton cahier
+  },
+  {
+    question: "2. Quels sont les niveaux d'analyse fondamentalement reconnus en sociologie à la FDSE ?",
+    options: [
+      "Microsociologie",
+      "Mésosociologie",
+      "Macrosociologie",
+      "Analyse psychologique"
+    ],
+    correct: [0, 1, 2]
+  },
+  {
+    question: "3. Concernant l'invention du terme 'Sociologie', quelles affirmations sont vraies ?",
+    options: [
+      "Emmanuel Joseph de Sieyès est le premier à l'avoir utilisé",
+      "Auguste Comte l'a popularisé en 1835",
+      "Le terme a été inventé par Karl Marx",
+      "Il a remplacé le concept de 'Physique sociale'"
+    ],
+    correct: [0, 1, 3]
+  },
+  {
+    question: "4. Quels sont les critères d'un 'Fait Social' selon Émile Durkheim ?",
+    options: [
+      "L'extériorité (extérieur à l'individu)",
+      "La contrainte (s'impose à l'individu)",
+      "Le caractère collectif (propre à la société)",
+      "L'hérédité biologique"
+    ],
+    correct: [0, 1, 2]
+  },
+  {
+    question: "5. Qui sont les figures majeures de la sociologie en Haïti citées dans vos documents ?",
+    options: [
+      "Justin C. Dorsainvil (approche scientifique du vaudou)",
+      "Jean Price-Mars (La Vocation de l'élite)",
+      "Jacquelin Montalvo-Depaigne (Sociologie juridique)",
+      "Madeleine Sylvain (1ère femme docteur en sociologie)"
+    ],
+    correct: [0, 1, 2, 3] // Toutes sont bonnes !
+  },
+  {
+    question: "6. Quels ouvrages ont été écrits par Jean Price-Mars ?",
+    options: [
+      "Ainsi parla l'oncle",
+      "La Vocation de l'élite",
+      "Le suicide",
+      "De la démocratie en Amérique"
+    ],
+    correct: [0, 1]
+  },
+  {
+    question: "7. Selon Karl Marx, quels éléments font partie de la 'Superstructure' ?",
+    options: [
+      "La religion",
+      "Le droit et la politique",
+      "Les rapports de production",
+      "Les idéologies"
+    ],
+    correct: [0, 1, 3] // Les rapports de production sont dans l'Infrastructure
+  },
+  {
+    question: "8. La sociologie est importante car :",
+    options: [
+      "Elle permet de démystifier l'ordre social établi",
+      "Elle aide à comprendre le sens que les gens donnent à la vie",
+      "Elle explique les catastrophes naturelles",
+      "Elle étudie l'homme dans son milieu social"
+    ],
+    correct: [0, 1, 3]
+  },
+  {
+    question: "9. Quels sont les types de suicide identifiés par Durkheim ?",
+    options: [
+      "Suicide égoïste",
+      "Suicide altruiste",
+      "Suicide anomique",
+      "Suicide fataliste"
+    ],
+    correct: [0, 1, 2, 3]
+  },
+  {
+    question: "10. La sociologie juridique en Haïti est liée à :",
+    options: [
+      "Jacquelin Montalvo-Depaigne",
+      "L'étude du droit comme fait social",
+      "La Faculté de Droit et des Sciences Économiques",
+      "L'étude exclusive des lois physiques"
+    ],
+    correct: [0, 1, 2]
+  }
 ];
