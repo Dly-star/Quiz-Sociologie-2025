@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Résultats Firebase</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
+    .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+    th { background: #2c3e50; color: white; }
+    .modal { display:none; position:fixed; top:5%; left:5%; width:90%; height:90%; background:white; padding:20px; overflow-y:auto; box-shadow: 0 0 20px rgba(0,0,0,0.5); z-index:100; border-radius:10px; }
+    .overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:50; }
+    .card { margin-bottom: 10px; padding: 10px; border-radius: 5px; border-left: 5px solid; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div id="auth">
+    <h2>Accès Administration</h2>
+    <input type="password" id="pass" placeholder="Mot de passe" style="padding:10px; width: 200px;">
+    <button onclick="login()" style="padding:10px; background:#2c3e50; color:white; cursor:pointer;">Se connecter</button>
+  </div>
+
+  <div id="dash" style="display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h2>Résultats des Étudiants</h2>
+        <button onclick="location.reload()">Déconnexion</button>
+    </div>
+    <table>
+      <thead><tr><th>Nom</th><th>Matricule</th><th>Score Final</th><th>Actions</th></tr></thead>
+      <tbody id="list"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="overlay" class="overlay" onclick="closeModal()"></div>
+<div id="modal" class="modal">
+    <div id="modal-content"></div>
+    <button onclick="closeModal()" style="margin-top:20px; padding:10px; width:100%; background:#7f8c8d; color:white; border:none; cursor:pointer;">Fermer</button>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBEWZpjSBGg0Mqi5qrVxrdYAgEdh1bRvvo",
+    authDomain: "evaluation-ce065.firebaseapp.com",
+    projectId: "evaluation-ce065",
+    storageBucket: "evaluation-ce065.firebasestorage.app",
+    messagingSenderId: "43890339600",
+    appId: "1:43890339600:web:6ef66e642b84e32ead7f95"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  function login() {
+    if(document.getElementById("pass").value === "admin123") {
+      document.getElementById("auth").style.display="none";
+      document.getElementById("dash").style.display="block";
+      loadData();
+    } else { alert("Mot de passe incorrect"); }
+  }
+
+  async function loadData() {
+    const list = document.getElementById("list");
+    list.innerHTML = "<tr><td colspan='4'>Chargement des données...</td></tr>";
+    try {
+        const snap = await db.collection("evaluations").get();
+        list.innerHTML = "";
+        snap.forEach(doc => {
+          const d = doc.data();
+          list.innerHTML += `
+            <tr>
+                <td>${d.nom}</td>
+                <td>${d.matricule}</td>
+                <td style="font-weight:bold; color:${d.scoreFinal >= 50 ? 'green' : 'red'}">${d.scoreFinal}%</td>
+                <td><button onclick="showDetail('${doc.id}')">Voir Détails</button></td>
+            </tr>`;
+        });
+    } catch(e) { alert("Erreur de lecture Firebase"); }
+  }
+
+  async function showDetail(id) {
+    const content = document.getElementById("modal-content");
+    content.innerHTML = "Chargement des réponses...";
+    document.getElementById("modal").style.display="block";
+    document.getElementById("overlay").style.display="block";
+
+    try {
+        const snap = await db.collection("evaluations").doc(id).collection("reponses").orderBy("timestamp").get();
+        let h = `<h2>Copie de : ${id}</h2><hr>`;
+        snap.forEach(doc => {
+          const r = doc.data();
+          h += `
+            <div class="card" style="background:${r.resultat ? '#eaffea' : '#ffeaea'}; border-color:${r.resultat ? '#27ae60' : '#e74c3c'}">
+              <b>${r.question}</b><br>
+              <span style="color:#555">Réponse donnée : ${r.reponseUtilisateur.join(", ")}</span><br>
+              ${!r.resultat ? `<span style="color:#27ae60">Bonne réponse : ${r.reponseCorrecte.join(", ")}</span>` : ''}
+            </div>`;
+        });
+        content.innerHTML = h;
+    } catch(e) { content.innerHTML = "Erreur de chargement des détails."; }
+  }
+
+  function closeModal() { document.getElementById("modal").style.display="none"; document.getElementById("overlay").style.display="none"; }
+</script>
+</body>
+</html>
