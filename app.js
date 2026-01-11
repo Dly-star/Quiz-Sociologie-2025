@@ -18,17 +18,12 @@ let user = { nom: "", matricule: "" };
 function startQuiz() {
   const n = document.getElementById("nom").value.trim();
   const m = document.getElementById("matricule").value.trim();
-
   if (!n || !m) return alert("Veuillez entrer votre nom et votre matricule");
-
   user.nom = n;
   user.matricule = m;
-  // On mélange et on prend 20 questions
   selectedQuestions = [...questions].sort(() => 0.5 - Math.random()).slice(0, 20);
-  
   currentIndex = 0;
   currentScore = 0;
-
   document.getElementById("login").style.display = "none";
   document.getElementById("quiz").style.display = "block";
   showQuestion();
@@ -38,13 +33,11 @@ function showQuestion() {
   const q = selectedQuestions[currentIndex];
   document.getElementById("question-number").innerText = `Question ${currentIndex + 1} / 20`;
   document.getElementById("question-text").innerText = q.question;
-  
   const optionsDiv = document.getElementById("options");
   optionsDiv.innerHTML = "";
   q.options.forEach((opt, i) => {
     optionsDiv.innerHTML += `<label class="option-label"><input type="checkbox" name="quiz-opt" value="${i}"> ${opt}</label>`;
   });
-
   document.getElementById("feedback").innerText = "";
   document.getElementById("correction").innerText = "";
   document.getElementById("btn-valider").style.display = "block";
@@ -53,37 +46,25 @@ function showQuestion() {
 async function submitAnswer() {
   const checkboxes = document.querySelectorAll("input[name='quiz-opt']:checked");
   const reponsesUtilisateurIndex = Array.from(checkboxes).map(cb => parseInt(cb.value));
-
   if (reponsesUtilisateurIndex.length === 0) return alert("Choisissez au moins une option");
-
   const q = selectedQuestions[currentIndex];
-  // Vérification de la réponse
   const estCorrecte = JSON.stringify(reponsesUtilisateurIndex.sort()) === JSON.stringify(q.correct.sort());
-  
   if (estCorrecte) currentScore++;
-
   document.getElementById("feedback").innerText = estCorrecte ? "Bonne réponse ✅" : "Mauvaise réponse ❌";
   document.getElementById("feedback").style.color = estCorrecte ? "green" : "red";
   document.getElementById("correction").innerText = "Réponse attendue : " + q.correct.map(i => q.options[i]).join(", ");
   document.getElementById("btn-valider").style.display = "none";
-
-  // Sauvegarde Firebase
   await saveToFirebase(q.question, reponsesUtilisateurIndex.map(i => q.options[i]), q.correct.map(i => q.options[i]), estCorrecte);
-
   setTimeout(() => {
     currentIndex++;
-    if (currentIndex < selectedQuestions.length) {
-        showQuestion();
-    } else {
-        finishQuiz();
-    }
+    if (currentIndex < selectedQuestions.length) showQuestion();
+    else finishQuiz();
   }, 2500);
 }
 
 async function saveToFirebase(qText, uAns, cAns, isOk) {
   const scoreFinalTemp = Math.round((currentScore / 20) * 100);
   const docRef = db.collection("evaluations").doc(user.matricule);
-  
   try {
       await docRef.set({
         nom: user.nom,
@@ -91,7 +72,6 @@ async function saveToFirebase(qText, uAns, cAns, isOk) {
         scoreFinal: scoreFinalTemp,
         date: new Date().toLocaleString()
       }, { merge: true });
-
       await docRef.collection("reponses").add({
         question: qText,
         reponseUtilisateur: uAns,
@@ -99,9 +79,7 @@ async function saveToFirebase(qText, uAns, cAns, isOk) {
         resultat: isOk,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
-  } catch (e) {
-      console.error("Erreur sauvegarde :", e);
-  }
+  } catch (e) { console.error("Erreur sauvegarde :", e); }
 }
 
 function finishQuiz() {
@@ -114,81 +92,34 @@ function finishQuiz() {
 async function checkMyResults() {
   const m = document.getElementById("matricule").value.trim();
   if (!m) return alert("Entrez votre matricule pour voir vos résultats");
-  
   const content = document.getElementById("review-content");
   document.getElementById("login").style.display = "none";
   document.getElementById("student-review").style.display = "block";
   content.innerHTML = "Chargement de vos résultats...";
-
-  try {
-    // Tentative de lecture du document étudiant
-    const doc = await db.collection("evaluations").doc(m).get();
-    
-    if (!doc.exists) {
-        content.innerHTML = "<h3>Aucun résultat trouvé</h3><p>Vérifiez votre matricule ou terminez l'évaluation d'abord.</p>";
-        return;
-    }
-
-    const d = doc.data();
-    let html = `<h3>${d.nom}</h3><p><b>Score Final : ${d.scoreFinal}%</b></p><p>Date : ${d.date}</p><hr>`;
-    
-    const snap = await db.collection("evaluations").doc(m).collection("reponses").orderBy("timestamp").get();
-    
-    snap.forEach(rDoc => {
-      const r = rDoc.data();
-      html += `
-        <div style="padding:10px; border-bottom:1px solid #eee; background:${r.resultat ? '#f0fff0' : '#fff0f0'}">
-            <p><b>${r.resultat ? '✅' : '❌'} ${r.question}</b></p>
-            <p><small>Votre réponse : ${r.reponseUtilisateur.join(", ")}</small></p>
-            ${!r.resultat ? `<p style="color:green"><small>Correct : ${r.reponseCorrecte.join(", ")}</small></p>` : ''}
-        </div>`;
-    });
-    content.innerHTML = html;
-  } catch (e) {
-    console.error(e);
-    content.innerHTML = "Erreur d'accès : Assurez-vous d'avoir terminé le quiz.";
-  }
-}
-  const content = document.getElementById("review-content");
-  document.getElementById("login").style.display = "none";
-  document.getElementById("student-review").style.display = "block";
-  content.innerHTML = "Chargement de vos résultats...";
-
   try {
     const doc = await db.collection("evaluations").doc(m).get();
     if (!doc.exists) {
-        content.innerHTML = "Aucun résultat trouvé pour ce matricule.";
+        content.innerHTML = "<h3>Aucun résultat trouvé</h3>";
         return;
     }
     const d = doc.data();
-    let html = `<h3>${d.nom} - Score: ${d.scoreFinal}%</h3><p>Date: ${d.date}</p><hr>`;
-    
+    let html = `<h3>${d.nom} - ${d.scoreFinal}%</h3><hr>`;
     const snap = await db.collection("evaluations").doc(m).collection("reponses").orderBy("timestamp").get();
     snap.forEach(rDoc => {
       const r = rDoc.data();
-      html += `
-        <div style="padding:10px; border-bottom:1px solid #eee; background:${r.resultat ? '#f0fff0' : '#fff0f0'}">
+      html += `<div style="padding:10px; border-bottom:1px solid #eee; background:${r.resultat ? '#f0fff0' : '#fff0f0'}">
             <p><b>${r.resultat ? '✅' : '❌'} ${r.question}</b></p>
             <p><small>Votre réponse: ${r.reponseUtilisateur.join(", ")}</small></p>
         </div>`;
     });
     content.innerHTML = html;
-  } catch (e) {
-    content.innerHTML = "Erreur lors de la récupération des données.";
-  }
+  } catch (e) { content.innerHTML = "Erreur de chargement."; }
 }
+
+function openAbout() { document.getElementById('about-modal').style.display = 'flex'; }
+function closeAbout() { document.getElementById('about-modal').style.display = 'none'; }
 
 if ('serviceWorker' in navigator) {
-  // On utilise bien le nom que TU as choisi
-  navigator.serviceWorker.register('./service-worker.js') 
-    .then(() => console.log("Service Worker enregistré avec succès !"))
-    .catch((err) => console.error("Erreur d'enregistrement du Service Worker :", err));
-}
-function openAbout() {
-    document.getElementById('about-modal').style.display = 'flex';
-}
-
-function closeAbout() {
-    document.getElementById('about-modal').style.display = 'none';
-}
-
+  navigator.serviceWorker.register('./service-worker.js');
+                               }
+  
