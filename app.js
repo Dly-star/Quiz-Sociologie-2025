@@ -130,3 +130,11 @@ async function checkMyResults() {
     content.innerHTML = "Erreur lors de la récupération des données.";
   }
 }
+
+if ('serviceWorker' in navigator) {
+  // On utilise bien le nom que TU as choisi
+  navigator.serviceWorker.register('./service-worker.js') 
+    .then(() => console.log("Service Worker enregistré avec succès !"))
+    .catch((err) => console.error("Erreur d'enregistrement du Service Worker :", err));
+}
+
