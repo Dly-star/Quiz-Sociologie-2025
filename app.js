@@ -184,4 +184,11 @@ if ('serviceWorker' in navigator) {
     .then(() => console.log("Service Worker enregistré avec succès !"))
     .catch((err) => console.error("Erreur d'enregistrement du Service Worker :", err));
 }
+function openAbout() {
+    document.getElementById('about-modal').style.display = 'flex';
+}
+
+function closeAbout() {
+    document.getElementById('about-modal').style.display = 'none';
+}
 
