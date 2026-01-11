@@ -23,8 +23,12 @@ function startQuiz() {
 
   user.nom = n;
   user.matricule = m;
+  // On mélange et on prend 20 questions
   selectedQuestions = [...questions].sort(() => 0.5 - Math.random()).slice(0, 20);
   
+  currentIndex = 0;
+  currentScore = 0;
+
   document.getElementById("login").style.display = "none";
   document.getElementById("quiz").style.display = "block";
   showQuestion();
@@ -53,6 +57,7 @@ async function submitAnswer() {
   if (reponsesUtilisateurIndex.length === 0) return alert("Choisissez au moins une option");
 
   const q = selectedQuestions[currentIndex];
+  // Vérification de la réponse
   const estCorrecte = JSON.stringify(reponsesUtilisateurIndex.sort()) === JSON.stringify(q.correct.sort());
   
   if (estCorrecte) currentScore++;
@@ -67,41 +72,83 @@ async function submitAnswer() {
 
   setTimeout(() => {
     currentIndex++;
-    if (currentIndex < selectedQuestions.length) showQuestion();
-    else finishQuiz();
+    if (currentIndex < selectedQuestions.length) {
+        showQuestion();
+    } else {
+        finishQuiz();
+    }
   }, 2500);
 }
 
 async function saveToFirebase(qText, uAns, cAns, isOk) {
-  const scoreFinal = Math.round((currentScore / 20) * 100);
+  const scoreFinalTemp = Math.round((currentScore / 20) * 100);
   const docRef = db.collection("evaluations").doc(user.matricule);
   
-  await docRef.set({
-    nom: user.nom,
-    matricule: user.matricule,
-    scoreFinal: scoreFinal,
-    date: new Date().toLocaleString()
-  }, { merge: true });
+  try {
+      await docRef.set({
+        nom: user.nom,
+        matricule: user.matricule,
+        scoreFinal: scoreFinalTemp,
+        date: new Date().toLocaleString()
+      }, { merge: true });
 
-  await docRef.collection("reponses").add({
-    question: qText,
-    reponseUtilisateur: uAns,
-    reponseCorrecte: cAns,
-    resultat: isOk,
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  });
+      await docRef.collection("reponses").add({
+        question: qText,
+        reponseUtilisateur: uAns,
+        reponseCorrecte: cAns,
+        resultat: isOk,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+  } catch (e) {
+      console.error("Erreur sauvegarde :", e);
+  }
 }
 
 function finishQuiz() {
   document.getElementById("quiz").style.display = "none";
   document.getElementById("result").style.display = "block";
-  document.getElementById("score-display").innerText = Math.round((currentScore / 20) * 100) + "%";
+  const finalPercent = Math.round((currentScore / 20) * 100);
+  document.getElementById("score-display").innerText = finalPercent + "%";
 }
 
 async function checkMyResults() {
   const m = document.getElementById("matricule").value.trim();
   if (!m) return alert("Entrez votre matricule pour voir vos résultats");
   
+  const content = document.getElementById("review-content");
+  document.getElementById("login").style.display = "none";
+  document.getElementById("student-review").style.display = "block";
+  content.innerHTML = "Chargement de vos résultats...";
+
+  try {
+    // Tentative de lecture du document étudiant
+    const doc = await db.collection("evaluations").doc(m).get();
+    
+    if (!doc.exists) {
+        content.innerHTML = "<h3>Aucun résultat trouvé</h3><p>Vérifiez votre matricule ou terminez l'évaluation d'abord.</p>";
+        return;
+    }
+
+    const d = doc.data();
+    let html = `<h3>${d.nom}</h3><p><b>Score Final : ${d.scoreFinal}%</b></p><p>Date : ${d.date}</p><hr>`;
+    
+    const snap = await db.collection("evaluations").doc(m).collection("reponses").orderBy("timestamp").get();
+    
+    snap.forEach(rDoc => {
+      const r = rDoc.data();
+      html += `
+        <div style="padding:10px; border-bottom:1px solid #eee; background:${r.resultat ? '#f0fff0' : '#fff0f0'}">
+            <p><b>${r.resultat ? '✅' : '❌'} ${r.question}</b></p>
+            <p><small>Votre réponse : ${r.reponseUtilisateur.join(", ")}</small></p>
+            ${!r.resultat ? `<p style="color:green"><small>Correct : ${r.reponseCorrecte.join(", ")}</small></p>` : ''}
+        </div>`;
+    });
+    content.innerHTML = html;
+  } catch (e) {
+    console.error(e);
+    content.innerHTML = "Erreur d'accès : Assurez-vous d'avoir terminé le quiz.";
+  }
+}
   const content = document.getElementById("review-content");
   document.getElementById("login").style.display = "none";
   document.getElementById("student-review").style.display = "block";
