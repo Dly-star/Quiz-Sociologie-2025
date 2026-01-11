@@ -16,11 +16,22 @@
 </head>
 <body>
 <div class="container">
-  <div id="auth">
-    <h2>Accès Administration</h2>
-    <input type="password" id="pass" placeholder="Mot de passe" style="padding:10px; width: 200px;">
-    <button onclick="login()" style="padding:10px; background:#2c3e50; color:white; cursor:pointer;">Se connecter</button>
+ <div id="auth">
+  <div id="auth-section" style="text-align: center; margin-top: 50px;">
+      <h2>Accès Administration Sécurisé</h2>
+      <p>Veuillez vous identifier pour voir les notes</p>
+      <input type="email" id="email" placeholder="Email (ex: prof@ecole.com)" 
+             style="display:block; margin: 10px auto; padding: 12px; width: 280px; border-radius: 8px; border: 1px solid #ccc;">
+      
+      <input type="password" id="password" placeholder="Mot de passe" 
+             style="display:block; margin: 10px auto; padding: 12px; width: 280px; border-radius: 8px; border: 1px solid #ccc;">
+      
+      <button onclick="handleLogin()" 
+              style="background:#2c3e50; color:white; padding: 12px 30px; border-radius: 8px; cursor:pointer; font-weight:bold;">
+              Se connecter
+      </button>
   </div>
+</div>
 
   <div id="dash" style="display:none;">
     <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -54,13 +65,28 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
-  function login() {
-    if(document.getElementById("pass").value === "admin123") {
-      document.getElementById("auth").style.display="none";
-      document.getElementById("dash").style.display="block";
-      loadData();
-    } else { alert("Mot de passe incorrect"); }
+  async function handleLogin() {
+  // On récupère ce que tu as tapé dans les deux champs
+  const email = document.getElementById("email").value;
+  const pass = document.getElementById("password").value;
+
+  try {
+    // Connexion sécurisée via le module Auth de Firebase
+    await firebase.auth().signInWithEmailAndPassword(email, pass);
+    
+    // Si l'email et le mot de passe sont corrects :
+    document.getElementById("auth").style.display = "none";
+    document.getElementById("dash").style.display = "block";
+    
+    // On lance le chargement des données
+    loadData(); 
+    console.log("Connexion réussie !");
+  } catch (error) {
+    // Si l'email ou le mot de passe est faux
+    alert("Erreur d'authentification : " + error.message);
   }
+  }
+  
 
   async function loadData() {
     const list = document.getElementById("list");
