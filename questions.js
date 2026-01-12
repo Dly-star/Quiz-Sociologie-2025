@@ -439,7 +439,6 @@ const questions = [
   ],
   correct: [0,1,2,4]
 },
-  const questions = [
   {
     question: "1. Selon J.M. Morin, quelles sont les raisons qui empêchent de définir la sociologie ? (Plusieurs réponses possibles)",
     options: [
