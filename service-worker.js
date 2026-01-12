@@ -1,6 +1,6 @@
 
 // Ce fichier permet à l'application de fonctionner hors ligne et d'être installable
-const CACHE_NAME = 'socio-cache-v7';
+const CACHE_NAME = 'socio-cache-v8';
 const ASSETS = [
   './',
   './index.html',
