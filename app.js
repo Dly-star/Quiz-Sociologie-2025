@@ -18,15 +18,27 @@ let user = { nom: "", matricule: "" };
 function startQuiz() {
   const n = document.getElementById("nom").value.trim();
   const m = document.getElementById("matricule").value.trim();
+  
   if (!n || !m) return alert("Veuillez entrer votre nom et votre matricule");
+  
+  // ALERTE DE TEST 1
+  if (typeof questions === 'undefined') {
+    return alert("Erreur : Le fichier des questions n'est pas chargé !");
+  }
+
   user.nom = n;
   user.matricule = m;
-  selectedQuestions = [...questions].sort(() => 0.5 - Math.random()).slice(0, 20);
-  currentIndex = 0;
-  currentScore = 0;
-  document.getElementById("login").style.display = "none";
-  document.getElementById("quiz").style.display = "block";
-  showQuestion();
+  
+  try {
+    selectedQuestions = [...questions].sort(() => 0.5 - Math.random()).slice(0, 20);
+    currentIndex = 0;
+    currentScore = 0;
+    document.getElementById("login").style.display = "none";
+    document.getElementById("quiz").style.display = "block";
+    showQuestion();
+  } catch (err) {
+    alert("Erreur technique : " + err.message);
+  }
 }
 
 function showQuestion() {
